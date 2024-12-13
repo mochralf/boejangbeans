@@ -1,0 +1,4 @@
+Flask==2.3.3                  # Framework web utama
+Flask-Session==0.4.0         # Untuk manajemen sesi server-side
+mysql-connector-python==8.2.0 # Koneksi ke MySQL
+Werkzeug==2.3.3              # Untuk hashing password dan utilitas lainnya
