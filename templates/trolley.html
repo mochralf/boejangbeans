@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boejang Beans</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}?v=1.0"
+    />
+    <style>
+      /* Same CSS styling as before */
+      .navbar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .trolley {
+        margin-top: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .product-list {
+        width: 80%;
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+      .product-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #ccc;
+        padding: 1rem 0;
+      }
+      .product-image {
+        width: 100px;
+        height: auto;
+      }
+      .product-details {
+        flex: 1;
+        margin-left: 1rem;
+      }
+      .product-details h3 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+      .product-actions {
+        display: flex;
+        align-items: center;
+      }
+      .product-price {
+        margin-left: 1rem;
+        font-weight: 600;
+      }
+      .buttons {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: space-between;
+        width: 80%;
+        max-width: 1000px;
+      }
+      .cta {
+        text-decoration: none;
+        color: white;
+        background-color: #007bff;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        text-align: center;
+      }
+      .cta:hover {
+        background-color: #0056b3;
+      }
+      .remove-btn {
+        background-color: red;
+        color: white;
+        border: none;
+        padding: 0.5rem;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .remove-btn:hover {
+        background-color: #ff0000;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="/" class="navbar-logo"><span>bag</span> boejangbeans</a>
+    </nav>
+    <section class="trolley" id="trolley">
+      <div class="product-list">
+        {% for product in cart %}
+        <div class="product-item" id="product-{{ loop.index }}">
+          <img
+            src="{{ product.image }}"
+            alt="{{ product.name }}"
+            class="product-image"
+          />
+          <div class="product-details">
+            <h3 class="product-name">{{ product.name }}</h3>
+          </div>
+          <div class="product-actions">
+            <span class="product-price" data-price="{{ product.price }}"
+              >Rp {{ product.price }}</span
+            >
+            <!-- Button to remove product from cart -->
+            <button
+              class="remove-btn"
+              onclick="removeProduct('{{ product.id }}')"
+            >
+              Hapus
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="total">Total Harga: <span id="total-price">Rp </span></div>
+      <div class="buttons">
+        <a href="/" class="cta">Lanjut Belanja</a>
+        <a href="/checkout" class="cta">Checkout</a>
+      </div>
+    </section>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script>
+      feather.replace();
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const productPrices = document.querySelectorAll(".product-price");
+        let totalPrice = 0;
+
+        productPrices.forEach(function (priceElement) {
+          const price = parseInt(priceElement.getAttribute("data-price"));
+          totalPrice += price;
+        });
+
+        document.getElementById("total-price").textContent = "Rp " + totalPrice;
+      });
+
+      // JavaScript function to remove a product from the cart
+      function removeProduct(productId) {
+        console.log("Trying to remove product with ID:", productId); // Debugging: cek ID produk
+
+        fetch("/remove_product", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ product_id: productId }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              // Jika produk berhasil dihapus
+              const productElement = document.getElementById(
+                "product-" + productId
+              );
+              if (productElement) {
+                productElement.remove();
+                alert("Produk berhasil dihapus");
+              } else {
+                alert("Produk tidak ditemukan di keranjang");
+              }
+            } else {
+              alert("Gagal menghapus produk: " + data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Terjadi kesalahan saat menghapus produk");
+          });
+      }
+    </script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>
