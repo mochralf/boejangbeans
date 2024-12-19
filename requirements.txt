@@ -1,0 +1,5 @@
+Flask==2.3.3
+Flask-Session==0.4.0
+Flask-Login==0.6.3
+mysql-connector-python==8.0.34
+Werkzeug==3.0.0
